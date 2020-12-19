@@ -1,0 +1,130 @@
+---
+root: true
+env:
+  browser: true
+  node: true
+parser: babel-eslint
+parserOptions:
+  ecmaVersion: 2020
+  allowImportExportEverywhere: true
+extends:
+  - eslint:recommended
+  - airbnb
+  - hardcore
+  - plugin:prettier/recommended
+  - plugin:react/recommended
+  - plugin:import/errors
+  - plugin:import/warnings
+  - prettier/react
+plugins:
+  - flowtype
+  - filenames
+rules:
+  default-case: 0
+  complexity: 0
+  no-process-env: 0
+  no-return-assign: 0
+  no-sync: 0
+  no-magic-numbers: 0
+  no-inline-comments: 0
+  line-comment-position: 0
+  no-underscore-dangle: 0
+  no-use-before-define: 0
+  no-negated-condition: 0
+  max-statements: 0
+  no-nested-ternary: 0
+  prettier/prettier: 2
+  jsx-a11y/click-events-have-key-events: 0
+  jsx-a11y/no-static-element-interactions: 0
+  react/jsx-filename-extension: 0
+  react/react-in-jsx-scope: 0
+  react/jsx-props-no-spreading: 0
+  react/forbid-prop-types: 0
+  no-constructor-bind/no-constructor-state: 0
+  no-plusplus: 0
+  max-lines: 0
+  no-console:
+    - error
+    - allow:
+        - error
+        - trace
+  no-shadow:
+    - error
+    - builtinGlobals: true
+      allow:
+        - crypto
+        - history
+        - name
+        - external
+        - status
+        - event
+        - open
+  no-unused-vars:
+    - error
+    - args: none
+      ignoreRestSiblings: true
+      vars: local
+      caughtErrors: none
+  no-unused-expressions:
+    - error
+    - allowTernary: true
+      allowShortCircuit: true
+  id-match:
+    - error
+    - (^[A-Za-z]+(?:[A-Z][a-z]*)*\d*$)|(^[A-Z]+(_[A-Z]+)*(_\d$)*$)|(^(_|\$)$)
+    - ignoreDestructuring: true
+  id-length:
+    - error
+    - exceptions:
+        - _
+        - h
+        - t
+        - i
+        - k
+        - e
+        - a
+        - b
+        - c
+  consistent-return:
+    - error
+    - treatUndefinedAsUnspecified: true
+  no-param-reassign:
+    - error
+    - props: false
+  func-style:
+    - error
+    - declaration
+    - allowArrowFunctions: true
+  filenames/match-regex:
+    - error
+    - ^([a-zA-Z]{1}[a-z]+)(([A-Z]{1}[a-z]+)*)((-([a-z]+))?)((\.([a-z]+))?)$
+  import/group-exports: 0
+  import/extensions: 0
+  import/no-extraneous-dependencies: 0
+  import/exports-last: 0
+  import/no-namespace: 0
+  import/max-dependencies: 0
+  import/no-unused-modules: 0
+  import/prefer-default-export: 0
+  import/no-anonymous-default-export:
+    - error
+    - allowArray: true
+      allowArrowFunction: true
+      allowObject: true
+  react/prop-types:
+    - error
+    - skipUndeclared: true
+  node/no-unpublished-import: 0
+  promise/avoid-new: 0
+  promise/always-return: 0
+  react/destructuring-assignment: 0
+  security/detect-non-literal-fs-filename: 0
+  unicorn/prevent-abbreviations: 0
+  unicorn/catch-error-name: 0
+  unicorn/no-null: 0
+  sonarjs/cognitive-complexity:
+    - error
+    - 25
+settings:
+  flowtype:
+    onlyFilesWithFlowAnnotation: false
