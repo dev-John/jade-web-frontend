@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-
 import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 import Container from '@material-ui/core/Container';
+
 import {
   Select,
   MenuItem,
@@ -21,7 +21,7 @@ import { ROUTES, CPF, CNPJ } from '../constants';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
-    marginTop: theme.spacing(2),
+    marginTop: theme.spacing(8),
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
@@ -40,37 +40,26 @@ const useStyles = makeStyles((theme) => ({
   submit: {
     margin: theme.spacing(3, 0, 2),
   },
-
-  hidden: {
-    display: 'none',
-  },
 }));
 
-export default function PersonForm({ ufs, cities }) {
+export default function PhoneSearch({}) {
   const classes = useStyles();
-
-  const [month, day, year] = new Date().toLocaleDateString().split('/');
   const [selectedRadio, setSelectedRadio] = React.useState('a');
   const [docType, setDocType] = useState(CPF); // CPF or CNPJ
-  const [name, setName] = useState();
   const [cpfCnpj, setCpfCnpj] = useState();
   const [uf, setUf] = useState();
   const [city, setCity] = useState();
-  const [phone, setPhone] = useState();
-  const [birthDate, setBirthDate] = useState(
-    year.concat('-').concat(month).concat('-').concat(day)
-  );
 
   const sendRequest = (e) => {
     e.preventDefault();
   };
 
   return (
-    <Container component="main" maxWidth="md">
+    <Container component="main" maxWidth="xs">
       <CssBaseline />
       <div className={classes.paper}>
         <Typography component="h1" variant="h5">
-          Criação de pessoa física/jurídica:
+          Lista pública de telefone
         </Typography>
         <form className={classes.form} noValidate>
           <Grid container spacing={2}>
@@ -112,19 +101,7 @@ export default function PersonForm({ ufs, cities }) {
                 />
               </RadioGroup>
             </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                autoComplete="name"
-                name="name"
-                variant="outlined"
-                required
-                fullWidth
-                id="name"
-                label="Nome"
-                onChange={(e) => setName(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <Grid item xs={12} sm={12} md={12} lg={12} xl={6}>
               <TextField
                 autoComplete="cpfCnpj"
                 name="cpfCnpj"
@@ -184,34 +161,7 @@ export default function PersonForm({ ufs, cities }) {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                variant="outlined"
-                fullWidth
-                name="date"
-                label="Data de Nascimento"
-                type="date"
-                id="date"
-                autoComplete="date"
-                style={{ marginTop: '8px', marginLeft: '8px', paddingRight: '15px' }}
-                InputLabelProps={{ shrink: true }}
-                onChange={(e) => setBirthDate(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                autoComplete="phone"
-                name="phone"
-                variant="outlined"
-                required
-                fullWidth
-                id="phone"
-                label="Telefone"
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            </Grid>
           </Grid>
-
           <Button
             type="submit"
             fullWidth
@@ -220,11 +170,11 @@ export default function PersonForm({ ufs, cities }) {
             className={classes.submit}
             onClick={(e) => sendRequest(e)}
           >
-            Salvar
+            Cadastrar
           </Button>
           <Grid container justify="center">
             <a href={ROUTES.PEOPLE_MANAGEMENT}>
-              <small> Voltar a Tela de Lista de Pessoas</small>
+              <small>Gerenciar Pessoa</small>
             </a>
           </Grid>
         </form>
