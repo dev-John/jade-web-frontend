@@ -12,9 +12,9 @@ import {
 } from '../store/actions/person';
 
 const mapStateToProperties = (state) => {
-  const { people, page, rowsPerPage } = state.person;
+  const { people, page, rowsPerPage, totalRows } = state.person;
 
-  return { people, page, rowsPerPage };
+  return { people, page, rowsPerPage, totalRows };
 };
 
 const mapDispatchToProperties = (dispatch) => ({

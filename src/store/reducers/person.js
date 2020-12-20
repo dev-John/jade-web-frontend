@@ -1,5 +1,6 @@
 import { updateObject } from '../../helpers/mix';
 import {
+  GET_TABLE_HEAD_SUCCESS,
   SET_PERSON_FORM,
   GET_PEOPLE_SUCCESS,
   SET_EDITING_PERSON,
@@ -10,8 +11,10 @@ import {
 } from '../../constants/actionTypes';
 
 const initialState = {
+  tableHead: [],
   page: 0,
   rowsPerPage: 10,
+  totalRows: 0,
   people: [],
   person: [],
   personForm: {
@@ -29,10 +32,15 @@ const initialState = {
 
 const personReducer = (state = initialState, action = {}) => {
   switch (action.type) {
+    case GET_TABLE_HEAD_SUCCESS:
+      return updateObject(state, { tableHead: action.tableHead });
     case SET_PERSON_FORM:
       return updateObject(state, { personForm: action.personForm });
     case GET_PEOPLE_SUCCESS:
-      return updateObject(state, { people: action.people });
+      return updateObject(state, {
+        people: action.data.people,
+        totalRows: action.data.totalPeople,
+      });
     case GET_PERSON_SUCCESS:
       return updateObject(state, { person: action.person });
     case SET_EDITING_PERSON:

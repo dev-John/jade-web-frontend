@@ -139,7 +139,7 @@ export default function PersonForm({
                       onChange={(e) => {
                         setSelectedRadio(e.target.value);
                         setDocType(CNPJ);
-                        setDocumentValid(validateCPF(personForm.cpfCnpj));
+                        setDocumentValid(validateCNPJ(personForm.cpfCnpj));
                       }}
                       value="b"
                       name="radio-button-demo"

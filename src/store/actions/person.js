@@ -1,4 +1,5 @@
 import {
+  GET_TABLE_HEAD_SUCCESS,
   SET_PERSON_FORM,
   GET_PEOPLE_SUCCESS,
   SET_EDITING_PERSON,
@@ -12,9 +13,10 @@ import { makeActionCreator } from '../../helpers/mix';
 import { isSuccess } from '../action-utilities';
 import { setErrorMessage, setFetchingRequest, setSuccessMessage } from './messaging';
 
+export const getTableHeadSuccess = makeActionCreator(GET_TABLE_HEAD_SUCCESS, 'tableHead');
 export const setPersonForm = makeActionCreator(SET_PERSON_FORM, 'personForm');
 export const setEditingPerson = makeActionCreator(SET_EDITING_PERSON, 'status');
-export const getPeopleSuccess = makeActionCreator(GET_PEOPLE_SUCCESS, 'people');
+export const getPeopleSuccess = makeActionCreator(GET_PEOPLE_SUCCESS, 'data');
 export const getPersonSuccess = makeActionCreator(GET_PERSON_SUCCESS, 'person');
 export const changePage = makeActionCreator(CHANGE_PAGE, 'page');
 export const changeRowsPerPage = makeActionCreator(CHANGE_ROWS_PER_PAGE, 'rowsPerPage');
@@ -89,16 +91,47 @@ export function editPerson() {
   };
 }
 
+export function getTableHead() {
+  return (dispatch, getState) => {
+    dispatch(setFetchingRequest(true));
+
+    const { personForm } = getState().person;
+    const type = personForm.type === 'juridica' ? 'pf' : 'pj';
+
+    const params = { type };
+
+    return api
+      .get('/get-table-head', { params })
+      .then((res) => {
+        if (isSuccess(res) && res.data.data.length !== 0) {
+          dispatch(getTableHeadSuccess(res.data.data));
+        } else {
+          dispatch(setErrorMessage());
+        }
+      })
+      .catch(console.error)
+      .finally(() => {
+        dispatch(setFetchingRequest(false));
+      });
+  };
+}
+
 export function getPeople() {
   return (dispatch, getState) => {
     dispatch(setFetchingRequest(true));
 
-    const { page, perPage } = getState().person;
+    const { page, rowsPerPage } = getState().person;
+
+    const params = { page, rowsPerPage };
 
     return api
-      .get('/get-people')
+      .get('/get-people', { params })
       .then((res) => {
-        isSuccess(res) ? dispatch(getPeopleSuccess(res.data.data)) : dispatch(setErrorMessage());
+        if (isSuccess(res) && res.data.data.length !== 0) {
+          dispatch(getPeopleSuccess(res.data.data));
+        } else {
+          dispatch(setErrorMessage('No momento não existem usuários cadastrados'));
+        }
       })
       .catch(console.error)
       .finally(() => {
@@ -110,6 +143,7 @@ export function getPeople() {
 export function searchPerson({ cpfCnpj, uf, city }) {
   return (dispatch) => {
     dispatch(setFetchingRequest(true));
+    dispatch(resetPerson());
 
     const params = { cpfCnpj, city, uf };
 

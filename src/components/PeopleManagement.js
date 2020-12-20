@@ -14,6 +14,7 @@ import {
   IconButton,
   Container,
   Grid,
+  Box,
 } from '@material-ui/core';
 import CancelIcon from '@material-ui/icons/Cancel';
 import EditIcon from '@material-ui/icons/Edit';
@@ -72,6 +73,7 @@ export default function PeopleManagement({
   changeRowsPerPage,
   page,
   rowsPerPage,
+  totalRows,
 }) {
   const classes = useStyles();
 
@@ -89,6 +91,7 @@ export default function PeopleManagement({
   const handleChangeRowsPerPage = (event) => {
     changeRowsPerPage(+event.target.value);
     changePage(0);
+    getPeople();
   };
 
   const editPerson = (person) => {
@@ -101,6 +104,8 @@ export default function PeopleManagement({
 
   return (
     <Container component="main" maxWidth="md">
+      <br />
+
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>
           <Table stickyHeader aria-label="sticky table">
@@ -148,20 +153,27 @@ export default function PeopleManagement({
           labelRowsPerPage="Registros por Página"
           nextIconButtonText="Próxima Página"
           backIconButtonText="Página Anterior"
-          rowsPerPageOptions={[10, 25, 100]}
+          rowsPerPageOptions={[5, 10, 25, 100]}
           component="div"
-          count={people.length}
+          count={totalRows}
           rowsPerPage={rowsPerPage}
           page={page}
           onChangePage={handleChangePage}
           onChangeRowsPerPage={handleChangeRowsPerPage}
         />
       </Paper>
-      <Grid container justify="center">
-        <a href={ROUTES.PERSON_FORM}>
-          <small> Voltar a Tela de Lista de Pessoas</small>
-        </a>
-      </Grid>
+      <Box m={2}>
+        <Grid container justify="space-between">
+          <a href={ROUTES.PHONE_SEARCH}>
+            <small> Voltar a Tela de Pesquisa de Telefone</small>
+          </a>
+          <a href={ROUTES.PERSON_FORM}>
+            <small>Criar nova pessoa</small>
+          </a>
+        </Grid>
+      </Box>
+
+      <Grid container justify="flex-end"></Grid>
     </Container>
   );
 }
