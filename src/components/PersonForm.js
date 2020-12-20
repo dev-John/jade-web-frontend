@@ -18,6 +18,7 @@ import {
 } from '@material-ui/core';
 
 import { ROUTES, CPF, CNPJ } from '../constants';
+import { validateCPF, validateCNPJ } from '../helpers/utils';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -53,61 +54,52 @@ export default function PersonForm({
   cities,
   setPersonForm,
   createPerson,
+  editPerson,
   isEditingPerson,
   personForm,
+  setErrorMessage,
 }) {
   const classes = useStyles();
 
   const [month, day, year] = new Date().toLocaleDateString().split('/');
-  const [preselectedUf, setPreselectedUf] = useState();
-  const [preselectedCity, setPreselectedCity] = useState();
+  const date = year.concat('-').concat(month).concat('-').concat(day);
+
   const [selectedRadio, setSelectedRadio] = React.useState('a');
   const [docType, setDocType] = useState(CPF); // CPF or CNPJ
-  const [name, setName] = useState();
-  const [cpfCnpj, setCpfCnpj] = useState();
-  const [uf, setUf] = useState();
-  const [city, setCity] = useState();
-  const [phone, setPhone] = useState();
-  const [birthDate, setBirthDate] = useState(
-    year.concat('-').concat(month).concat('-').concat(day)
-  );
+  const [isDocumentValid, setDocumentValid] = useState(false);
 
   useEffect(() => {
     getUfs();
   }, []);
 
   useEffect(() => {
-    uf && getCitiesByUf(uf);
-  }, [uf]);
+    personForm.uf && getCitiesByUf(personForm.uf);
+  }, [personForm.uf]);
 
   useEffect(() => {
     if (isEditingPerson) {
+      console.log('personForm', personForm);
       const isPessoaFisica = personForm.type === 'fisica';
       setSelectedRadio(isPessoaFisica ? 'a' : 'b');
       setDocType(isPessoaFisica ? CPF : CNPJ);
+      getCitiesByUf(personForm.uf);
     }
-
-    console.log('🚀 ~ file: PersonForm.js ~ line 91 ~ useEffect ~ ufs', ufs);
-    if (ufs && isEditingPerson) {
-      setPreselectedUf(personForm.uf);
-      setPreselectedCity(personForm.city);
-    }
-
-    console.log('preselectedUf', preselectedUf);
-  }, [isEditingPerson, ufs]);
+  }, [isEditingPerson]);
 
   const sendRequest = (e) => {
     e.preventDefault();
+    let isCpfCnpjValid = false;
+
     setPersonForm({
+      ...personForm,
       type: docType === CPF ? 'fisica' : 'juridica',
-      name,
-      cpfCnpj,
-      uf,
-      city,
-      phone,
-      birthDate,
     });
-    createPerson();
+
+    if (isDocumentValid) {
+      isEditingPerson && personForm._id ? editPerson() : createPerson();
+    } else {
+      setErrorMessage(`O ${docType} não é valido`);
+    }
   };
 
   return (
@@ -129,6 +121,7 @@ export default function PersonForm({
                       onChange={(e) => {
                         setSelectedRadio(e.target.value);
                         setDocType(CPF);
+                        setDocumentValid(validateCPF(personForm.cpfCnpj));
                       }}
                       value="a"
                       name="radio-button-demo"
@@ -146,6 +139,7 @@ export default function PersonForm({
                       onChange={(e) => {
                         setSelectedRadio(e.target.value);
                         setDocType(CNPJ);
+                        setDocumentValid(validateCPF(personForm.cpfCnpj));
                       }}
                       value="b"
                       name="radio-button-demo"
@@ -157,33 +151,52 @@ export default function PersonForm({
                 />
               </RadioGroup>
             </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={!isEditingPerson ? 4 : 6}
+              lg={!isEditingPerson ? 4 : 6}
+              xl={3}
+            >
               <TextField
                 autoComplete="name"
                 name="name"
-                value={personForm.name || name}
+                value={personForm.name}
                 variant="outlined"
                 required
                 fullWidth
                 id="name"
                 label="Nome"
-                onChange={(e) => setName(e.target.value)}
+                onChange={(e) => setPersonForm({ ...personForm, name: e.target.value })}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <Grid
+              item
+              xs={12}
+              sm={6}
+              md={!isEditingPerson ? 4 : 6}
+              lg={!isEditingPerson ? 4 : 6}
+              xl={3}
+            >
               <TextField
                 autoComplete="cpfCnpj"
                 name="cpfCnpj"
-                value={personForm.cpfCnpj || cpfCnpj}
+                value={personForm.cpfCnpj}
                 variant="outlined"
                 required
                 fullWidth
                 id="cpfCnpj"
                 label={docType === CPF ? 'CPF' : 'CNPJ'}
-                onChange={(e) => setCpfCnpj(e.target.value)}
+                onChange={(e) => {
+                  setPersonForm({ ...personForm, cpfCnpj: e.target.value });
+                  setDocumentValid(
+                    docType === CPF ? validateCPF(e.target.value) : validateCNPJ(e.target.value)
+                  );
+                }}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <Grid item xs={12} sm={!isEditingPerson ? 6 : 4} md={4} lg={4} xl={3}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel id="demo-simple-select-outlined-label">UF</InputLabel>
                 <Select
@@ -191,11 +204,11 @@ export default function PersonForm({
                   required
                   fullWidth
                   name="uf"
-                  value={preselectedUf || uf}
+                  value={personForm.uf}
                   id="uf"
                   label="UF"
                   autoComplete="uf"
-                  onChange={(e) => setUf(e.target.value)}
+                  onChange={(e) => setPersonForm({ ...personForm, uf: e.target.value })}
                 >
                   <MenuItem value="">
                     <em>Selecione uma UF</em>
@@ -208,7 +221,7 @@ export default function PersonForm({
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <Grid item xs={12} sm={!isEditingPerson ? 6 : 4} md={4} lg={4} xl={3}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel id="demo-simple-select-outlined-label">Cidade</InputLabel>
                 <Select
@@ -218,9 +231,9 @@ export default function PersonForm({
                   id="city"
                   label="Cidade"
                   name="city"
-                  value={preselectedCity || city}
+                  value={personForm.city}
                   autoComplete="city"
-                  onChange={(e) => setCity(e.target.value)}
+                  onChange={(e) => setPersonForm({ ...personForm, city: e.target.value })}
                 >
                   <MenuItem value="">
                     <em>Selecione uma Cidade</em>
@@ -246,23 +259,23 @@ export default function PersonForm({
                   autoComplete="date"
                   style={{ marginTop: '8px', marginLeft: '8px', paddingRight: '15px' }}
                   InputLabelProps={{ shrink: true }}
-                  onChange={(e) => setBirthDate(e.target.value)}
+                  onChange={(e) => setPersonForm({ ...personForm, birthDate: e.target.value })}
                 />
               </Grid>
             ) : (
               ''
             )}
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <Grid item xs={12} sm={!isEditingPerson ? 6 : 4} md={4} lg={4} xl={3}>
               <TextField
                 autoComplete="phone"
                 name="phone"
-                value={personForm.phone || phone}
+                value={personForm.phone}
                 variant="outlined"
                 required
                 fullWidth
                 id="phone"
                 label="Telefone"
-                onChange={(e) => setPhone(e.target.value)}
+                onChange={(e) => setPersonForm({ ...personForm, phone: e.target.value })}
               />
             </Grid>
           </Grid>

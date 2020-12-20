@@ -83,6 +83,7 @@ export default function PhoneSearch({ getUfs, getCitiesByUf, ufs, cities, search
   const [cpfCnpj, setCpfCnpj] = useState();
   const [uf, setUf] = useState();
   const [city, setCity] = useState();
+  const [disabledButton, setDisabledButton] = useState(false);
 
   useEffect(() => {
     getUfs();
@@ -92,13 +93,19 @@ export default function PhoneSearch({ getUfs, getCitiesByUf, ufs, cities, search
     uf && getCitiesByUf(uf);
   }, [uf]);
 
+  const timeoutProtect = () => {
+    setTimeout(() => setDisabledButton(false), 4000);
+  };
+
   const sendRequest = (e) => {
     e.preventDefault();
     searchPerson({ cpfCnpj, uf, city });
+    setDisabledButton(true);
+    timeoutProtect();
   };
 
   return (
-    <Container component="main" maxWidth="xs">
+    <Container component="main" maxWidth="sm">
       <CssBaseline />
       <div className={classes.paper}>
         <Typography component="h1" variant="h5">
@@ -211,6 +218,7 @@ export default function PhoneSearch({ getUfs, getCitiesByUf, ufs, cities, search
             variant="contained"
             color="primary"
             className={classes.submit}
+            disabled={disabledButton}
             onClick={(e) => sendRequest(e)}
           >
             Buscar

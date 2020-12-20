@@ -4,9 +4,14 @@ import {
   GET_PEOPLE_SUCCESS,
   SET_EDITING_PERSON,
   GET_PERSON_SUCCESS,
+  CHANGE_PAGE,
+  CHANGE_ROWS_PER_PAGE,
+  RESET_PERSON,
 } from '../../constants/actionTypes';
 
 const initialState = {
+  page: 0,
+  rowsPerPage: 10,
   people: [],
   person: [],
   personForm: {
@@ -17,6 +22,7 @@ const initialState = {
     phone: '',
     uf: '',
     city: '',
+    birthDate: '',
   },
   isEditingPerson: false,
 };
@@ -31,6 +37,12 @@ const personReducer = (state = initialState, action = {}) => {
       return updateObject(state, { person: action.person });
     case SET_EDITING_PERSON:
       return updateObject(state, { isEditingPerson: action.status });
+    case CHANGE_PAGE:
+      return updateObject(state, { page: action.page });
+    case CHANGE_ROWS_PER_PAGE:
+      return updateObject(state, { rowsPerPage: action.rowsPerPage });
+    case RESET_PERSON:
+      return updateObject(state, initialState);
 
     default:
       return state;

@@ -3,6 +3,9 @@ import {
   GET_PEOPLE_SUCCESS,
   SET_EDITING_PERSON,
   GET_PERSON_SUCCESS,
+  CHANGE_PAGE,
+  CHANGE_ROWS_PER_PAGE,
+  RESET_PERSON,
 } from '../../constants/actionTypes';
 import { api } from '../../helpers/http';
 import { makeActionCreator } from '../../helpers/mix';
@@ -13,15 +16,54 @@ export const setPersonForm = makeActionCreator(SET_PERSON_FORM, 'personForm');
 export const setEditingPerson = makeActionCreator(SET_EDITING_PERSON, 'status');
 export const getPeopleSuccess = makeActionCreator(GET_PEOPLE_SUCCESS, 'people');
 export const getPersonSuccess = makeActionCreator(GET_PERSON_SUCCESS, 'person');
+export const changePage = makeActionCreator(CHANGE_PAGE, 'page');
+export const changeRowsPerPage = makeActionCreator(CHANGE_ROWS_PER_PAGE, 'rowsPerPage');
+
+export const resetPerson = makeActionCreator(RESET_PERSON);
 
 export function createPerson() {
   return (dispatch, getState) => {
     dispatch(setFetchingRequest(true));
 
     const { personForm } = getState().person;
-    const { type, name, cpfCnpj, phone, city, uf } = personForm;
+    const { type, name, cpfCnpj, phone, city, uf, birthDate } = personForm;
 
     const payload = {
+      type,
+      name,
+      cpfCnpj,
+      phone,
+      city,
+      uf,
+      birthDate,
+    };
+
+    return api
+      .post('/create-person', payload)
+      .then((res) => {
+        if (isSuccess(res)) {
+          dispatch(setSuccessMessage('Usuário cadastrado com sucesso!'));
+          dispatch(resetPerson());
+        } else {
+          dispatch(setErrorMessage(res.data.message));
+        }
+      })
+      .catch(console.error)
+      .finally(() => {
+        dispatch(setFetchingRequest(false));
+      });
+  };
+}
+
+export function editPerson() {
+  return (dispatch, getState) => {
+    dispatch(setFetchingRequest(true));
+
+    const { personForm } = getState().person;
+    const { _id, type, name, cpfCnpj, phone, city, uf } = personForm;
+
+    const payload = {
+      _id,
       type,
       name,
       cpfCnpj,
@@ -31,11 +73,14 @@ export function createPerson() {
     };
 
     return api
-      .post('/create-person', payload)
+      .post('/edit-person', payload)
       .then((res) => {
-        isSuccess(res)
-          ? dispatch(setSuccessMessage('Usuário cadastrado com sucesso!'))
-          : dispatch(setErrorMessage());
+        if (isSuccess(res)) {
+          dispatch(setSuccessMessage('Usuário alterado com sucesso!'));
+          dispatch(resetPerson());
+        } else {
+          dispatch(setErrorMessage(res.data.message));
+        }
       })
       .catch(console.error)
       .finally(() => {
@@ -47,6 +92,8 @@ export function createPerson() {
 export function getPeople() {
   return (dispatch, getState) => {
     dispatch(setFetchingRequest(true));
+
+    const { page, perPage } = getState().person;
 
     return api
       .get('/get-people')
@@ -69,7 +116,12 @@ export function searchPerson({ cpfCnpj, uf, city }) {
     return api
       .get('/search-person', { params })
       .then((res) => {
-        isSuccess(res) ? dispatch(getPersonSuccess(res.data.data)) : dispatch(setErrorMessage());
+        if (isSuccess(res) && res.data.data.length !== 0) {
+          dispatch(getPersonSuccess(res.data.data));
+        } else {
+          console.log('era para mostrar');
+          dispatch(setErrorMessage('A pesquisa não retornou resultados'));
+        }
       })
       .catch(console.error)
       .finally(() => {

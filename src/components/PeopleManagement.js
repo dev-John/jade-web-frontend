@@ -68,10 +68,13 @@ export default function PeopleManagement({
   deletePerson,
   setPersonForm,
   setEditingPerson,
+  changePage,
+  changeRowsPerPage,
+  page,
+  rowsPerPage,
 }) {
   const classes = useStyles();
-  const [page, setPage] = React.useState(0);
-  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
   const history = useHistory();
 
   useEffect(() => {
@@ -79,12 +82,13 @@ export default function PeopleManagement({
   }, []);
 
   const handleChangePage = (event, newPage) => {
-    setPage(newPage);
+    changePage(newPage);
+    getPeople();
   };
 
   const handleChangeRowsPerPage = (event) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
+    changeRowsPerPage(+event.target.value);
+    changePage(0);
   };
 
   const editPerson = (person) => {
@@ -141,6 +145,9 @@ export default function PeopleManagement({
           </Table>
         </TableContainer>
         <TablePagination
+          labelRowsPerPage="Registros por Página"
+          nextIconButtonText="Próxima Página"
+          backIconButtonText="Página Anterior"
           rowsPerPageOptions={[10, 25, 100]}
           component="div"
           count={people.length}
