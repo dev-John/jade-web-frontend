@@ -1,14 +1,11 @@
 import React from 'react';
 import { Container, CssBaseline, makeStyles, LinearProgress } from '@material-ui/core';
-import Box from '@material-ui/core/Box';
 import { ThemeProvider } from '@material-ui/styles';
 
 import theme from '../theme';
 import { useCommonStyles } from '../styles';
 import Snackbars from '../containers/Snackbars';
 import Routes from '../routes';
-
-import Copyright from './Copyright';
 
 const useStyles = makeStyles({
   container: {
@@ -48,9 +45,6 @@ function App({ error, success, info, alert, fetching }) {
               </ThemeProvider>
             </Container>
           </main>
-          <Box mt={5}>
-            <Copyright />
-          </Box>
         </div>
       </ThemeProvider>
     </>

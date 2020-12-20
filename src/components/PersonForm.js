@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -46,10 +46,21 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PersonForm({ ufs, cities }) {
+export default function PersonForm({
+  getUfs,
+  getCitiesByUf,
+  ufs,
+  cities,
+  setPersonForm,
+  createPerson,
+  isEditingPerson,
+  personForm,
+}) {
   const classes = useStyles();
 
   const [month, day, year] = new Date().toLocaleDateString().split('/');
+  const [preselectedUf, setPreselectedUf] = useState();
+  const [preselectedCity, setPreselectedCity] = useState();
   const [selectedRadio, setSelectedRadio] = React.useState('a');
   const [docType, setDocType] = useState(CPF); // CPF or CNPJ
   const [name, setName] = useState();
@@ -61,8 +72,42 @@ export default function PersonForm({ ufs, cities }) {
     year.concat('-').concat(month).concat('-').concat(day)
   );
 
+  useEffect(() => {
+    getUfs();
+  }, []);
+
+  useEffect(() => {
+    uf && getCitiesByUf(uf);
+  }, [uf]);
+
+  useEffect(() => {
+    if (isEditingPerson) {
+      const isPessoaFisica = personForm.type === 'fisica';
+      setSelectedRadio(isPessoaFisica ? 'a' : 'b');
+      setDocType(isPessoaFisica ? CPF : CNPJ);
+    }
+
+    console.log('🚀 ~ file: PersonForm.js ~ line 91 ~ useEffect ~ ufs', ufs);
+    if (ufs && isEditingPerson) {
+      setPreselectedUf(personForm.uf);
+      setPreselectedCity(personForm.city);
+    }
+
+    console.log('preselectedUf', preselectedUf);
+  }, [isEditingPerson, ufs]);
+
   const sendRequest = (e) => {
     e.preventDefault();
+    setPersonForm({
+      type: docType === CPF ? 'fisica' : 'juridica',
+      name,
+      cpfCnpj,
+      uf,
+      city,
+      phone,
+      birthDate,
+    });
+    createPerson();
   };
 
   return (
@@ -116,6 +161,7 @@ export default function PersonForm({ ufs, cities }) {
               <TextField
                 autoComplete="name"
                 name="name"
+                value={personForm.name || name}
                 variant="outlined"
                 required
                 fullWidth
@@ -128,6 +174,7 @@ export default function PersonForm({ ufs, cities }) {
               <TextField
                 autoComplete="cpfCnpj"
                 name="cpfCnpj"
+                value={personForm.cpfCnpj || cpfCnpj}
                 variant="outlined"
                 required
                 fullWidth
@@ -143,20 +190,21 @@ export default function PersonForm({ ufs, cities }) {
                   variant="outlined"
                   required
                   fullWidth
+                  name="uf"
+                  value={preselectedUf || uf}
                   id="uf"
                   label="UF"
-                  name="uf"
                   autoComplete="uf"
                   onChange={(e) => setUf(e.target.value)}
                 >
                   <MenuItem value="">
                     <em>Selecione uma UF</em>
                   </MenuItem>
-                  {/* {ufs.map((uf) => (
-                    <MenuItem key={uf._id} value={uf._id}>
-                      {uf}
+                  {ufs.map((uf) => (
+                    <MenuItem key={uf.uf} value={uf.uf}>
+                      {uf.uf}
                     </MenuItem>
-                  ))} */}
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -170,38 +218,45 @@ export default function PersonForm({ ufs, cities }) {
                   id="city"
                   label="Cidade"
                   name="city"
+                  value={preselectedCity || city}
                   autoComplete="city"
                   onChange={(e) => setCity(e.target.value)}
                 >
                   <MenuItem value="">
                     <em>Selecione uma Cidade</em>
                   </MenuItem>
-                  {/* {cities.map((city) => (
-                    <MenuItem key={city._id} value={city._id}>
-                      {city.name}
+                  {cities.map((city) => (
+                    <MenuItem key={city} value={city}>
+                      {city}
                     </MenuItem>
-                  ))} */}
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
-            <Grid xs={12} sm={6} md={4} lg={4} xl={3}>
-              <TextField
-                variant="outlined"
-                fullWidth
-                name="date"
-                label="Data de Nascimento"
-                type="date"
-                id="date"
-                autoComplete="date"
-                style={{ marginTop: '8px', marginLeft: '8px', paddingRight: '15px' }}
-                InputLabelProps={{ shrink: true }}
-                onChange={(e) => setBirthDate(e.target.value)}
-              />
-            </Grid>
+
+            {!isEditingPerson ? (
+              <Grid xs={12} sm={6} md={4} lg={4} xl={3}>
+                <TextField
+                  variant="outlined"
+                  fullWidth
+                  name="date"
+                  label="Data de Nascimento"
+                  type="date"
+                  id="date"
+                  autoComplete="date"
+                  style={{ marginTop: '8px', marginLeft: '8px', paddingRight: '15px' }}
+                  InputLabelProps={{ shrink: true }}
+                  onChange={(e) => setBirthDate(e.target.value)}
+                />
+              </Grid>
+            ) : (
+              ''
+            )}
             <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
               <TextField
                 autoComplete="phone"
                 name="phone"
+                value={personForm.phone || phone}
                 variant="outlined"
                 required
                 fullWidth

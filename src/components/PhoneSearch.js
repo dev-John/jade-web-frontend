@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
@@ -15,6 +15,12 @@ import {
   Radio,
   RadioGroup,
   FormControlLabel,
+  TableContainer,
+  Table,
+  TableHead,
+  TableRow,
+  TableCell,
+  TableBody,
 } from '@material-ui/core';
 
 import { ROUTES, CPF, CNPJ } from '../constants';
@@ -42,7 +48,35 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function PhoneSearch({}) {
+const columns = [
+  {
+    id: 'name',
+    label: 'Nome/Razão Social',
+    minWidth: 170,
+    align: 'right',
+  },
+  {
+    id: 'cpfCnpj',
+    label: 'CPF/CNPJ',
+    minWidth: 170,
+    align: 'right',
+  },
+  {
+    id: 'city',
+    label: 'Cidade',
+    minWidth: 170,
+    align: 'right',
+  },
+  {
+    id: 'phone',
+    label: 'Telefone',
+    minWidth: 170,
+    align: 'right',
+    // format: (value) => new Date(value).toLocaleDateString('pt-br'),
+  },
+];
+
+export default function PhoneSearch({ getUfs, getCitiesByUf, ufs, cities, searchPerson, person }) {
   const classes = useStyles();
   const [selectedRadio, setSelectedRadio] = React.useState('a');
   const [docType, setDocType] = useState(CPF); // CPF or CNPJ
@@ -50,8 +84,17 @@ export default function PhoneSearch({}) {
   const [uf, setUf] = useState();
   const [city, setCity] = useState();
 
+  useEffect(() => {
+    getUfs();
+  }, []);
+
+  useEffect(() => {
+    uf && getCitiesByUf(uf);
+  }, [uf]);
+
   const sendRequest = (e) => {
     e.preventDefault();
+    searchPerson({ cpfCnpj, uf, city });
   };
 
   return (
@@ -113,7 +156,7 @@ export default function PhoneSearch({}) {
                 onChange={(e) => setCpfCnpj(e.target.value)}
               />
             </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel id="demo-simple-select-outlined-label">UF</InputLabel>
                 <Select
@@ -129,15 +172,15 @@ export default function PhoneSearch({}) {
                   <MenuItem value="">
                     <em>Selecione uma UF</em>
                   </MenuItem>
-                  {/* {ufs.map((uf) => (
-                    <MenuItem key={uf._id} value={uf._id}>
-                      {uf}
+                  {ufs.map((uf) => (
+                    <MenuItem key={uf.uf} value={uf.uf}>
+                      {uf.uf}
                     </MenuItem>
-                  ))} */}
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6} md={4} lg={4} xl={3}>
+            <Grid item xs={12} sm={6} md={6} lg={6} xl={6}>
               <FormControl variant="outlined" fullWidth>
                 <InputLabel id="demo-simple-select-outlined-label">Cidade</InputLabel>
                 <Select
@@ -153,11 +196,11 @@ export default function PhoneSearch({}) {
                   <MenuItem value="">
                     <em>Selecione uma Cidade</em>
                   </MenuItem>
-                  {/* {cities.map((city) => (
-                    <MenuItem key={city._id} value={city._id}>
-                      {city.name}
+                  {cities.map((city) => (
+                    <MenuItem key={city} value={city}>
+                      {city}
                     </MenuItem>
-                  ))} */}
+                  ))}
                 </Select>
               </FormControl>
             </Grid>
@@ -170,7 +213,7 @@ export default function PhoneSearch({}) {
             className={classes.submit}
             onClick={(e) => sendRequest(e)}
           >
-            Cadastrar
+            Buscar
           </Button>
           <Grid container justify="center">
             <a href={ROUTES.PEOPLE_MANAGEMENT}>
@@ -178,6 +221,39 @@ export default function PhoneSearch({}) {
             </a>
           </Grid>
         </form>
+        <TableContainer className={classes.container}>
+          <Table stickyHeader aria-label="sticky table">
+            <TableHead>
+              <TableRow>
+                {columns.map((column) => (
+                  <TableCell
+                    key={column.id}
+                    align={column.align}
+                    style={{ minWidth: column.minWidth }}
+                  >
+                    {column.label}
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {person.map((row) => {
+                return (
+                  <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
+                    {columns.map((column) => {
+                      const value = row[column.id];
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          {column.format ? column.format(value) : value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
       </div>
     </Container>
   );
