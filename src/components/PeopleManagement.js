@@ -20,40 +20,6 @@ import CancelIcon from '@material-ui/icons/Cancel';
 import EditIcon from '@material-ui/icons/Edit';
 import { ROUTES } from '../constants';
 
-const columns = [
-  {
-    id: 'type',
-    label: 'Tipo',
-    minWidth: 100,
-    // format: (value) => (value === 0 ? 'Física' : 'Jurídica'),
-  },
-  {
-    id: 'name',
-    label: 'Nome/Razão Social',
-    minWidth: 170,
-    align: 'right',
-  },
-  {
-    id: 'cpfCnpj',
-    label: 'CPF/CNPJ',
-    minWidth: 170,
-    align: 'right',
-  },
-  {
-    id: 'phone',
-    label: 'Telefone',
-    minWidth: 170,
-    align: 'right',
-    // format: (value) => new Date(value).toLocaleDateString('pt-br'),
-  },
-  {
-    id: 'city',
-    label: 'Cidade',
-    minWidth: 170,
-    align: 'right',
-  },
-];
-
 const useStyles = makeStyles({
   root: {
     width: '100%',
@@ -64,6 +30,8 @@ const useStyles = makeStyles({
 });
 
 export default function PeopleManagement({
+  getTableHead,
+  tableHead,
   people,
   getPeople,
   deletePerson,
@@ -74,12 +42,15 @@ export default function PeopleManagement({
   page,
   rowsPerPage,
   totalRows,
+  resetPerson,
 }) {
   const classes = useStyles();
 
   const history = useHistory();
 
   useEffect(() => {
+    resetPerson();
+    getTableHead();
     getPeople();
   }, []);
 
@@ -111,7 +82,7 @@ export default function PeopleManagement({
           <Table stickyHeader aria-label="sticky table">
             <TableHead>
               <TableRow>
-                {columns.map((column) => (
+                {tableHead.map((column) => (
                   <TableCell
                     key={column.id}
                     align={column.align}
@@ -126,7 +97,7 @@ export default function PeopleManagement({
               {people.map((row) => {
                 return (
                   <TableRow hover role="checkbox" tabIndex={-1} key={row.code}>
-                    {columns.map((column) => {
+                    {tableHead.map((column) => {
                       const value = row[column.id];
                       return (
                         <TableCell key={column.id} align={column.align}>

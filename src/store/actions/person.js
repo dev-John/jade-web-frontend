@@ -96,7 +96,17 @@ export function getTableHead() {
     dispatch(setFetchingRequest(true));
 
     const { personForm } = getState().person;
-    const type = personForm.type === 'juridica' ? 'pf' : 'pj';
+    let type;
+
+    switch (personForm.type) {
+      case 'fisica':
+        type = 'pf';
+        break;
+      case 'juridica':
+        type = 'pj';
+      default:
+        type = 'general';
+    }
 
     const params = { type };
 
