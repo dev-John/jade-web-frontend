@@ -15,6 +15,7 @@ import {
   Container,
   Grid,
   Box,
+  Tooltip,
 } from '@material-ui/core';
 import CancelIcon from '@material-ui/icons/Cancel';
 import EditIcon from '@material-ui/icons/Edit';
@@ -76,7 +77,6 @@ export default function PeopleManagement({
   return (
     <Container component="main" maxWidth="md">
       <br />
-
       <Paper className={classes.root}>
         <TableContainer className={classes.container}>
           <Table stickyHeader aria-label="sticky table">
@@ -105,13 +105,16 @@ export default function PeopleManagement({
 
                           {column.id === 'actions' ? (
                             <>
-                              <IconButton onClick={() => deletePerson(row._id)}>
-                                <CancelIcon />
-                              </IconButton>
-
-                              <IconButton>
-                                <EditIcon onClick={() => editPerson(row)} />
-                              </IconButton>
+                              <Tooltip title="Excluir">
+                                <IconButton onClick={() => deletePerson(row._id)}>
+                                  <CancelIcon />
+                                </IconButton>
+                              </Tooltip>
+                              <Tooltip title="Editar">
+                                <IconButton>
+                                  <EditIcon onClick={() => editPerson(row)} />
+                                </IconButton>
+                              </Tooltip>
                             </>
                           ) : (
                             ''
