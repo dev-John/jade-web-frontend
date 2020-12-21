@@ -61,7 +61,6 @@ export default function PersonForm({
 }) {
   const classes = useStyles();
 
-  const [month, day, year] = new Date().toLocaleDateString().split('/');
   const [selectedRadio, setSelectedRadio] = React.useState('a');
   const [docType, setDocType] = useState(CPF); // CPF or CNPJ
   const [isDocumentValid, setDocumentValid] = useState(false);
