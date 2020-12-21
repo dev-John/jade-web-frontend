@@ -1,7 +1,7 @@
 import { connect } from 'react-redux';
 
 import PhoneSearch from '../components/PhoneSearch';
-import { getTableHead, searchPerson } from '../store/actions/person';
+import { getSearchTableHead, searchPerson } from '../store/actions/person';
 import { getUfs, getCitiesByUf } from '../store/actions/location';
 
 const mapStateToProperties = (state) => {
@@ -12,7 +12,7 @@ const mapStateToProperties = (state) => {
 };
 
 const mapDispatchToProperties = (dispatch) => ({
-  getTableHead: () => dispatch(getTableHead()),
+  getSearchTableHead: () => dispatch(getSearchTableHead()),
   searchPerson: ({ cpfCnpj, uf, city }) => dispatch(searchPerson({ cpfCnpj, uf, city })),
   getUfs: () => dispatch(getUfs()),
   getCitiesByUf: (uf) => dispatch(getCitiesByUf(uf)),

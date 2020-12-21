@@ -50,7 +50,7 @@ const useStyles = makeStyles((theme) => ({
 
 export default function PhoneSearch({
   tableHead,
-  getTableHead,
+  getSearchTableHead,
   getUfs,
   getCitiesByUf,
   ufs,
@@ -80,7 +80,7 @@ export default function PhoneSearch({
 
   const sendRequest = (e) => {
     e.preventDefault();
-    getTableHead();
+    getSearchTableHead();
     searchPerson({ cpfCnpj, uf, city });
     setDisabledButton(true);
     timeoutProtect();

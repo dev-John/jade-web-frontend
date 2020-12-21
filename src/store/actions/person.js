@@ -126,6 +126,26 @@ export function getTableHead() {
   };
 }
 
+export function getSearchTableHead() {
+  return (dispatch) => {
+    dispatch(setFetchingRequest(true));
+
+    return api
+      .get('/get-search-table-head')
+      .then((res) => {
+        if (isSuccess(res) && res.data.data.length !== 0) {
+          dispatch(getTableHeadSuccess(res.data.data));
+        } else {
+          dispatch(setErrorMessage());
+        }
+      })
+      .catch(console.error)
+      .finally(() => {
+        dispatch(setFetchingRequest(false));
+      });
+  };
+}
+
 export function getPeople() {
   return (dispatch, getState) => {
     dispatch(setFetchingRequest(true));
