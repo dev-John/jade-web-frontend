@@ -62,8 +62,6 @@ export default function PersonForm({
   const classes = useStyles();
 
   const [month, day, year] = new Date().toLocaleDateString().split('/');
-  const date = year.concat('-').concat(month).concat('-').concat(day);
-
   const [selectedRadio, setSelectedRadio] = React.useState('a');
   const [docType, setDocType] = useState(CPF); // CPF or CNPJ
   const [isDocumentValid, setDocumentValid] = useState(false);
@@ -78,8 +76,10 @@ export default function PersonForm({
 
   useEffect(() => {
     if (isEditingPerson) {
-      console.log('personForm', personForm);
       const isPessoaFisica = personForm.type === 'fisica';
+      setDocumentValid(
+        isPessoaFisica ? validateCPF(personForm.cpfCnpj) : validateCNPJ(personForm.cpfCnpj)
+      );
       setSelectedRadio(isPessoaFisica ? 'a' : 'b');
       setDocType(isPessoaFisica ? CPF : CNPJ);
       getCitiesByUf(personForm.uf);

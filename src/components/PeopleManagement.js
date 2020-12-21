@@ -102,18 +102,23 @@ export default function PeopleManagement({
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {column.format ? column.format(value) : value}
+
+                          {column.id === 'actions' ? (
+                            <>
+                              <IconButton onClick={() => deletePerson(row._id)}>
+                                <CancelIcon />
+                              </IconButton>
+
+                              <IconButton>
+                                <EditIcon onClick={() => editPerson(row)} />
+                              </IconButton>
+                            </>
+                          ) : (
+                            ''
+                          )}
                         </TableCell>
                       );
                     })}
-                    <TableCell>
-                      <IconButton onClick={() => deletePerson(row._id)}>
-                        <CancelIcon />
-                      </IconButton>
-
-                      <IconButton>
-                        <EditIcon onClick={() => editPerson(row)} />
-                      </IconButton>
-                    </TableCell>
                   </TableRow>
                 );
               })}
